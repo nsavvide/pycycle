@@ -68,10 +68,10 @@ int process_python_file(const char *filepath, const char *base_dir, Graph *g,
     return -1;
 
   int current_id = get_or_create_node(g, map, current_module);
-  free(current_module);
 
   FILE *file = fopen(filepath, "r");
   if (!file) {
+    free(current_module);
     return -1;
   }
 
@@ -116,17 +116,58 @@ int process_python_file(const char *filepath, const char *base_dir, Graph *g,
         len = 255;
       }
 
-      char module_name[256];
-      strncpy(module_name, ptr, len);
-      module_name[len] = '\0';
+      char raw_target[256];
+      strncpy(raw_target, ptr, len);
+      raw_target[len] = '\0';
 
-      int target_id = get_or_create_node(g, map, module_name);
+      char final_target[512];
+
+      if (raw_target[0] == '.') {
+        int leading_dots = 0;
+        while (raw_target[leading_dots] == '.') {
+          leading_dots++;
+        }
+
+        char parent_pkg[256];
+        strncpy(parent_pkg, current_module, 255);
+        parent_pkg[255] = '\0';
+
+        int is_init_py = (strstr(filepath, "__init__.py") != NULL);
+        int levels_to_strip = is_init_py ? (leading_dots - 1) : leading_dots;
+
+        while (levels_to_strip > 0 && parent_pkg[0] != '\0') {
+          char *last_dot = strrchr(parent_pkg, '.');
+          if (last_dot) {
+            *last_dot = '\0';
+          } else {
+            parent_pkg[0] = '\0';
+          }
+          levels_to_strip--;
+        }
+
+        const char *remainder = raw_target + leading_dots;
+
+        if (parent_pkg[0] != '\0' && remainder[0] != '\0') {
+          snprintf(final_target, sizeof(final_target), "%s.%s", parent_pkg,
+                   remainder);
+        } else if (parent_pkg[0] != '\0') {
+          snprintf(final_target, sizeof(final_target), "%s", parent_pkg);
+        } else {
+          snprintf(final_target, sizeof(final_target), "%s", remainder);
+        }
+      } else {
+        strncpy(final_target, raw_target, sizeof(final_target) - 1);
+        final_target[sizeof(final_target) - 1] = '\0';
+      }
+
+      int target_id = get_or_create_node(g, map, final_target);
       graph_add_edge(g, current_id, target_id, line_number);
-
-      line_number++;
     }
+
+    line_number++;
   }
 
+  free(current_module);
   fclose(file);
   return 0;
 }
