@@ -2,14 +2,35 @@
 #include "../include/hashmap.h"
 #include "../include/walker.h"
 #include <stdio.h>
+#include <string.h>
 
 int main(int argc, char *argv[]) {
   if (argc < 2) {
-    printf("Usage: %s <python_project_directory>\n", argv[0]);
+    printf("Usage: %s <python_project_directory> [--export [filename.dot]]\n",
+           argv[0]);
     return 1;
   }
 
   const char *target_dir = argv[1];
+  bool export_dot = false;
+  const char *dot_filename = "graph.dot";
+
+  for (int i = 1; i < argc; i++) {
+    if (strcmp(argv[i], "--export") == 0) {
+      export_dot = true;
+      if (i + 1 < argc && argv[i + 1][0] != '-') {
+        dot_filename = argv[i + 1];
+        i++;
+      }
+    } else if (target_dir == NULL) {
+      target_dir = argv[i];
+    }
+  }
+
+  if (target_dir == NULL) {
+    fprintf(stderr, "Error: No target directory specified.\n");
+    return 1;
+  }
 
   Graph *g = graph_create(1024);
   Hashmap *map = hashmap_create(1024);
@@ -31,6 +52,10 @@ int main(int argc, char *argv[]) {
 
   printf("Modules Found: %zu\n", g->node_count);
   printf("Searching for cycles...\n");
+
+  if(export_dot) {
+    graph_export_dot(g, dot_filename);
+  }
 
   graph_find_cycles(g);
 
