@@ -112,17 +112,23 @@ int process_python_file(const char *filepath, const char *base_dir, Graph *g,
       char final_target[512];
 
       if (raw_target[0] == '.') {
-        char parent_pkg[256];
-        strncpy(parent_pkg, current_module, 255);
-        parent_pkg[255] = '\0';
+        char base_module[256];
+        strncpy(base_module, current_module, sizeof(base_module) - 1);
+        base_module[sizeof(base_module) - 1] = '\0';
 
-        char *last_dot = strrchr(parent_pkg, '.');
+        char *last_dot = strrchr(base_module, '.');
         if (last_dot) {
+          /* Trim to parent package/module, e.g. "pkg.mod" -> "pkg" */
           *last_dot = '\0';
-          snprintf(final_target, sizeof(final_target), "%s%s", parent_pkg,
-                   raw_target);
+        }
+
+        if (raw_target[1] == '\0') {
+          /* "from . import X" or "from . import" -> resolve to base_module */
+          snprintf(final_target, sizeof(final_target), "%s", base_module);
         } else {
-          snprintf(final_target, sizeof(final_target), "%s", raw_target + 1);
+          /* Single leading dot: resolve relative to base_module */
+          snprintf(final_target, sizeof(final_target), "%s%s", base_module,
+                   raw_target);
         }
       } else {
         strncpy(final_target, raw_target, sizeof(final_target));
