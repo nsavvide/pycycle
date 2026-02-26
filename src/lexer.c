@@ -75,7 +75,7 @@ int process_python_file(const char *filepath, const char *base_dir, Graph *g,
     return -1;
   }
 
-  char line[1024]; 
+  char line[1024];
   int line_number = 1;
   while (fgets(line, sizeof(line), file)) {
 
@@ -84,17 +84,30 @@ int process_python_file(const char *filepath, const char *base_dir, Graph *g,
     if (strncmp(ptr, "import ", 7) == 0) {
       ptr += 7;
 
-      size_t len = strcspn(ptr, " \t\r\n,");
-      if (len >= 256) {
-        len = 255;
+      while (*ptr != '\0' && *ptr != '\n' && *ptr != '\r') {
+        ptr = skip_whitespace(ptr);
+        if (*ptr == '\0')
+          break;
+
+        size_t len = strcspn(ptr, " \t\r\n,");
+        if (len > 0) {
+          size_t copy_len = len < 256 ? len : 255;
+          char module_name[256];
+          strncpy(module_name, ptr, copy_len);
+          module_name[copy_len] = '\0';
+
+          int target_id = get_or_create_node(g, map, module_name);
+          graph_add_edge(g, current_id, target_id, line_number);
+        }
+
+        while (*ptr != '\0' && *ptr != ',' && *ptr != '\n' && *ptr != '\r') {
+          ptr++;
+        }
+
+        if (*ptr == ',') {
+          ptr++;
+        }
       }
-
-      char module_name[256];
-      strncpy(module_name, ptr, len);
-      module_name[len] = '\0';
-
-      int target_id = get_or_create_node(g, map, module_name);
-      graph_add_edge(g, current_id, target_id, line_number);
     } else if (strncmp(ptr, "from ", 5) == 0) {
       ptr += 5;
 
