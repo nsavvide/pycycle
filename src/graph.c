@@ -194,3 +194,30 @@ void graph_find_cycles(Graph *g) {
 
   free(path_stack);
 }
+
+void graph_export_dot(Graph *g, const char *filename) {
+  FILE *f = fopen(filename, "w");
+  if (!f) {
+    fprintf(stderr, "Error: Could not open %s for writing.\n", filename);
+    return;
+  }
+
+  fprintf(f, "digraph PyCycle {\n");
+  fprintf(f, "  rankdir=LR;\n");
+  fprintf(f, "  node [shape=box, style=filled, fillcolor=lightgray];\n\n");
+
+  for (size_t i = 0; i < g->node_count; i++) {
+    Node *n = g->nodes[i];
+    for (Edge *e = n->edges; e; e = e->next) {
+      fprintf(f, "  \"%s\" -> \"%s\" [label=\"line %d\"];\n", n->name,
+              g->nodes[e->target_id]->name, e->line_number);
+    }
+  }
+
+  fprintf(f, "}\n");
+  fclose(f);
+
+  printf("\nGraph exported to \x1b[36m%s\x1b[0m\n", filename);
+  printf("   Tip: Render it using '\x1b[33mdot -Tpng %s -o graph.png\x1b[0m'\n",
+         filename);
+}

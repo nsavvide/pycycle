@@ -92,6 +92,13 @@ int graph_add_edge(Graph *g, int from_id, int to_id, int line_number);
  */
 void graph_find_cycles(Graph *g);
 
+/**
+ * @brief Exports the graph structure to a DOT file for visualization.
+ * @param g Pointer to the Graph.
+ * @param filename The name of the output DOT file.
+ */
+void graph_export_dot(Graph *g, const char *filename);
+
 #ifdef __cplusplus
 }
 #endif
