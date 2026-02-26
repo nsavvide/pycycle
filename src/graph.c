@@ -159,7 +159,18 @@ int graph_add_edge(Graph *g, int from_id, int to_id, int line_number) {
     return -1;
   }
 
+  if (from_id == to_id) {
+    return 0;
+  }
+
   Node *from_node = g->nodes[from_id];
+
+  for (Edge *e = from_node->edges; e; e = e->next) {
+    if (e->target_id == to_id) {
+      return 0;
+    }
+  }
+
   Edge *new_edge = (Edge *)calloc(1, sizeof(Edge));
   if (new_edge == NULL) {
     return -1;
