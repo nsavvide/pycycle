@@ -181,3 +181,45 @@ Project Link: https://github.com/nsavvide/pycycle
   (<a href="#top">Back to top</a>)
 </p>
 
+
+<!-- MARKDOWN VARIABLES (LINKS, IMAGES) -->
+<!-- Documentation: https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+<!-- Badges documentation: https://shields.io/badges -->
+
+[contributors-badge]: https://img.shields.io/github/contributors/nsavvide/ebpf-detnet-shaping?style=for-the-badge
+[contributors-url]: https://github.com/nsavvide/ebpf-detnet-shaping/graphs/contributors
+[forks-badge]: https://img.shields.io/github/forks/nsavvide/ebpf-detnet-shaping?style=for-the-badge
+[forks-url]: https://github.com/nsavvide/ebpf-detnet-shaping/network/members
+[stars-badge]: https://img.shields.io/github/stars/nsavvide/ebpf-detnet-shaping?style=for-the-badge
+[stars-url]: https://github.com/nsavvide/ebpf-detnet-shaping/stargazers
+[issues-badge]: https://img.shields.io/github/issues/nsavvide/ebpf-detnet-shaping?style=for-the-badge
+[issues-url]: https://github.com/nsavvide/ebpf-detnet-shaping/issues
+[license-badge]: https://img.shields.io/github/license/nsavvide/ebpf-detnet-shaping?style=for-the-badge
+[license-url]: https://github.com/nsavvide/ebpf-detnet-shaping/blob/master/LICENSE.txt
+
+<!-- Other ready-made icons can be seen for example here: https://github.com/inttter/md-badges -->
+
+[html-badge]: https://img.shields.io/badge/HTML-%23E34F26.svg?logo=html5&logoColor=white
+[html-url]: https://www.w3schools.com/html/
+[css-badge]: https://img.shields.io/badge/CSS-1572B6?logo=css3&logoColor=fff
+[css-url]: https://www.w3schools.com/css/
+[js-badge]: https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000
+[js-url]: https://www.javascript.com/
+[nextjs-badge]: https://img.shields.io/badge/Next.js-black?logo=next.js&logoColor=white
+[nextjs-url]: https://nextjs.org/
+[nodejs-badge]: https://img.shields.io/badge/Node.js-6DA55F?logo=node.js&logoColor=white
+[nodejs-url]: https://nodejs.org/
+[reactjs-badge]: https://img.shields.io/badge/React-%2320232a.svg?logo=react&logoColor=%2361DAFB
+[reactjs-url]: https://react.dev/
+[redux-badge]: https://img.shields.io/badge/Redux-764ABC?logo=redux&logoColor=fff
+[redux-url]: https://redux.js.org/
+[sass-badge]: https://img.shields.io/badge/Sass-C69?logo=sass&logoColor=fff
+[sass-url]: https://sass-lang.com/
+[rust-badge]: https://img.shields.io/badge/Rust-%23000000.svg?logo=rust&logoColor=white
+[rust-url]: https://www.rust-lang.org/
+[c-badge]: https://img.shields.io/badge/C-00599C?logo=c&logoColor=white
+[c-url]: https://www.iso.org/standard/74528.html
+[go-badge]: https://img.shields.io/badge/Go-%2300ADD8.svg?logo=go&logoColor=white
+[go-url]: https://golang.org/
+[ebpf-badge]: https://img.shields.io/badge/eBPF-FF6600?logo=ebpf&logoColor=white
+[ebpf-url]: https://ebpf.io/
