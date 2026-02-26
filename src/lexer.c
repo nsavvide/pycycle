@@ -61,6 +61,60 @@ static int get_or_create_node(Graph *g, Hashmap *map, const char *module_name) {
   return id;
 }
 
+/**
+ * @brief Resolves relative/absolute imports and safely adds the edge.
+ */
+static void resolve_and_add_edge(Graph *g, Hashmap *map, int current_id,
+                                 const char *raw_target,
+                                 const char *current_module,
+                                 const char *filepath, int line_number) {
+  if (raw_target[0] == '\0')
+    return;
+
+  char final_target[512];
+
+  if (raw_target[0] == '.') {
+    int leading_dots = 0;
+    while (raw_target[leading_dots] == '.') {
+      leading_dots++;
+    }
+
+    char parent_pkg[256];
+    strncpy(parent_pkg, current_module, 255);
+    parent_pkg[255] = '\0';
+
+    int is_init_py = (strstr(filepath, "__init__.py") != NULL);
+    int levels_to_strip = is_init_py ? (leading_dots - 1) : leading_dots;
+
+    while (levels_to_strip > 0 && parent_pkg[0] != '\0') {
+      char *last_dot = strrchr(parent_pkg, '.');
+      if (last_dot) {
+        *last_dot = '\0';
+      } else {
+        parent_pkg[0] = '\0';
+      }
+      levels_to_strip--;
+    }
+
+    const char *remainder = raw_target + leading_dots;
+
+    if (parent_pkg[0] != '\0' && remainder[0] != '\0') {
+      snprintf(final_target, sizeof(final_target), "%s.%s", parent_pkg,
+               remainder);
+    } else if (parent_pkg[0] != '\0') {
+      snprintf(final_target, sizeof(final_target), "%s", parent_pkg);
+    } else {
+      snprintf(final_target, sizeof(final_target), "%s", remainder);
+    }
+  } else {
+    strncpy(final_target, raw_target, sizeof(final_target) - 1);
+    final_target[sizeof(final_target) - 1] = '\0';
+  }
+
+  int target_id = get_or_create_node(g, map, final_target);
+  graph_add_edge(g, current_id, target_id, line_number);
+}
+
 int process_python_file(const char *filepath, const char *base_dir, Graph *g,
                         Hashmap *map) {
   char *current_module = filepath_to_modulename(filepath, base_dir);
@@ -96,72 +150,64 @@ int process_python_file(const char *filepath, const char *base_dir, Graph *g,
           strncpy(module_name, ptr, copy_len);
           module_name[copy_len] = '\0';
 
-          int target_id = get_or_create_node(g, map, module_name);
-          graph_add_edge(g, current_id, target_id, line_number);
+          resolve_and_add_edge(g, map, current_id, module_name, current_module,
+                               filepath, line_number);
         }
 
-        while (*ptr != '\0' && *ptr != ',' && *ptr != '\n' && *ptr != '\r') {
+        while (*ptr != '\0' && *ptr != ',' && *ptr != '\n' && *ptr != '\r')
           ptr++;
-        }
-
-        if (*ptr == ',') {
+        if (*ptr == ',')
           ptr++;
-        }
       }
     } else if (strncmp(ptr, "from ", 5) == 0) {
       ptr += 5;
 
-      size_t len = strcspn(ptr, " \t\r\n,");
-      if (len >= 256) {
-        len = 255;
-      }
+      size_t base_len = strcspn(ptr, " \t\r\n");
+      char base_raw[256] = {0};
+      strncpy(base_raw, ptr, base_len < 255 ? base_len : 255);
 
-      char raw_target[256];
-      strncpy(raw_target, ptr, len);
-      raw_target[len] = '\0';
+      ptr += base_len;
+      ptr = skip_whitespace(ptr);
 
-      char final_target[512];
+      resolve_and_add_edge(g, map, current_id, base_raw, current_module,
+                           filepath, line_number);
 
-      if (raw_target[0] == '.') {
-        int leading_dots = 0;
-        while (raw_target[leading_dots] == '.') {
-          leading_dots++;
-        }
+      if (strncmp(ptr, "import ", 7) == 0) {
+        ptr += 7;
 
-        char parent_pkg[256];
-        strncpy(parent_pkg, current_module, 255);
-        parent_pkg[255] = '\0';
+        while (*ptr != '\0' && *ptr != '\n' && *ptr != '\r') {
+          ptr = skip_whitespace(ptr);
+          if (*ptr == '\0')
+            break;
 
-        int is_init_py = (strstr(filepath, "__init__.py") != NULL);
-        int levels_to_strip = is_init_py ? (leading_dots - 1) : leading_dots;
+          size_t item_len = strcspn(ptr, " \t\r\n,");
+          if (item_len > 0) {
+            char item_name[256] = {0};
+            strncpy(item_name, ptr, item_len < 255 ? item_len : 255);
 
-        while (levels_to_strip > 0 && parent_pkg[0] != '\0') {
-          char *last_dot = strrchr(parent_pkg, '.');
-          if (last_dot) {
-            *last_dot = '\0';
-          } else {
-            parent_pkg[0] = '\0';
+            if (strcmp(item_name, "*") != 0) {
+              char combined_raw[512];
+              size_t blen = strlen(base_raw);
+
+              if (blen > 0 && base_raw[blen - 1] == '.') {
+                snprintf(combined_raw, sizeof(combined_raw), "%s%s", base_raw,
+                         item_name);
+              } else {
+                snprintf(combined_raw, sizeof(combined_raw), "%s.%s", base_raw,
+                         item_name);
+              }
+
+              resolve_and_add_edge(g, map, current_id, combined_raw,
+                                   current_module, filepath, line_number);
+            }
           }
-          levels_to_strip--;
-        }
 
-        const char *remainder = raw_target + leading_dots;
-
-        if (parent_pkg[0] != '\0' && remainder[0] != '\0') {
-          snprintf(final_target, sizeof(final_target), "%s.%s", parent_pkg,
-                   remainder);
-        } else if (parent_pkg[0] != '\0') {
-          snprintf(final_target, sizeof(final_target), "%s", parent_pkg);
-        } else {
-          snprintf(final_target, sizeof(final_target), "%s", remainder);
+          while (*ptr != '\0' && *ptr != ',' && *ptr != '\n' && *ptr != '\r')
+            ptr++;
+          if (*ptr == ',')
+            ptr++;
         }
-      } else {
-        strncpy(final_target, raw_target, sizeof(final_target) - 1);
-        final_target[sizeof(final_target) - 1] = '\0';
       }
-
-      int target_id = get_or_create_node(g, map, final_target);
-      graph_add_edge(g, current_id, target_id, line_number);
     }
 
     line_number++;
