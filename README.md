@@ -186,16 +186,16 @@ Project Link: https://github.com/nsavvide/pycycle
 <!-- Documentation: https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 <!-- Badges documentation: https://shields.io/badges -->
 
-[contributors-badge]: https://img.shields.io/github/contributors/nsavvide/ebpf-detnet-shaping?style=for-the-badge
-[contributors-url]: https://github.com/nsavvide/ebpf-detnet-shaping/graphs/contributors
-[forks-badge]: https://img.shields.io/github/forks/nsavvide/ebpf-detnet-shaping?style=for-the-badge
-[forks-url]: https://github.com/nsavvide/ebpf-detnet-shaping/network/members
-[stars-badge]: https://img.shields.io/github/stars/nsavvide/ebpf-detnet-shaping?style=for-the-badge
-[stars-url]: https://github.com/nsavvide/ebpf-detnet-shaping/stargazers
-[issues-badge]: https://img.shields.io/github/issues/nsavvide/ebpf-detnet-shaping?style=for-the-badge
-[issues-url]: https://github.com/nsavvide/ebpf-detnet-shaping/issues
-[license-badge]: https://img.shields.io/github/license/nsavvide/ebpf-detnet-shaping?style=for-the-badge
-[license-url]: https://github.com/nsavvide/ebpf-detnet-shaping/blob/master/LICENSE.txt
+[contributors-badge]: https://img.shields.io/github/contributors/nsavvide/pycycle?style=for-the-badge
+[contributors-url]: https://github.com/nsavvide/pycycle/graphs/contributors
+[forks-badge]: https://img.shields.io/github/forks/nsavvide/pycycle?style=for-the-badge
+[forks-url]: https://github.com/nsavvide/pycycle/network/members
+[stars-badge]: https://img.shields.io/github/stars/nsavvide/pycycle?style=for-the-badge
+[stars-url]: https://github.com/nsavvide/pycycle/stargazers
+[issues-badge]: https://img.shields.io/github/issues/nsavvide/pycycle?style=for-the-badge
+[issues-url]: https://github.com/nsavvide/pycycle/issues
+[license-badge]: https://img.shields.io/github/license/nsavvide/pycycle?style=for-the-badge
+[license-url]: https://github.com/nsavvide/pycycle/blob/master/LICENSE.txt
 
 <!-- Other ready-made icons can be seen for example here: https://github.com/inttter/md-badges -->
 
@@ -221,5 +221,3 @@ Project Link: https://github.com/nsavvide/pycycle
 [c-url]: https://www.iso.org/standard/74528.html
 [go-badge]: https://img.shields.io/badge/Go-%2300ADD8.svg?logo=go&logoColor=white
 [go-url]: https://golang.org/
-[ebpf-badge]: https://img.shields.io/badge/eBPF-FF6600?logo=ebpf&logoColor=white
-[ebpf-url]: https://ebpf.io/
